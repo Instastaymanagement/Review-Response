@@ -44,6 +44,8 @@ REVIEW_BOARDS = {
 }
 
 RESPONSE_LIMIT = 1000  # Hospitable / Airbnb maximum
+# Hospitable's respond endpoint only supports these channels
+REPLY_PLATFORMS = {"airbnb", "booking", "booking.com", "bookingcom"}
 DRY_RUN = os.environ.get("DRY_RUN", "").lower() in ("1", "true", "yes")
 MAX_AGE_DAYS = int(os.environ.get("MAX_AGE_DAYS") or 30)
 MAX_PER_RUN = int(os.environ.get("MAX_PER_RUN") or 40)
@@ -230,7 +232,7 @@ def recent_hospitable_reviews(since):
 
 
 def post_response(review_id, text):
-    return hospitable(f"/reviews/{review_id}/response", body={"response": text})
+    return hospitable(f"/reviews/{review_id}/respond", body={"response": text})
 
 
 def style_examples(reviews, limit=4):
@@ -346,6 +348,10 @@ def main():
             stats["already"] += 1
             if not DRY_RUN:
                 mark_responded(c, None)
+            continue
+        if (review.get("platform") or "").lower() not in REPLY_PLATFORMS:
+            stats["closed"] += 1
+            report.append(f"PLATFORM NOT SUPPORTED ({review.get('platform')}): {label}")
             continue
         if review.get("can_respond") is False:
             stats["closed"] += 1
