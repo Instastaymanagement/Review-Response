@@ -382,4 +382,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except BaseException as exc:  # surface the reason on the run page, not just in the log
+        if os.environ.get("GITHUB_ACTIONS") and not (isinstance(exc, SystemExit) and exc.code in (0, None)):
+            import traceback
+            detail = traceback.format_exc()[-3000:]
+            print("::error title=Review replies crashed::" + detail.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A"), flush=True)
+        raise
