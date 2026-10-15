@@ -16,6 +16,7 @@ Environment:
   HOSPITABLE_API_TOKEN  Hospitable personal access token with write access (required)
   MONDAY_API_TOKEN      monday.com API token (required)
   ANTHROPIC_API_KEY     Claude API key (required)
+  ANTHROPIC_WORKSPACE_ID  workspace for the key; needed only if the key isn't scoped to one
   DRY_RUN               "true" to draft replies without posting or changing monday
   MAX_AGE_DAYS          only reply to reviews this recent (default 30)
   MAX_PER_RUN           cap on replies per run (default 40)
@@ -320,7 +321,11 @@ def main():
 
     reviews, _ = recent_hospitable_reviews(today - dt.timedelta(days=MAX_AGE_DAYS + 1))
     examples = style_examples(reviews)
-    client = anthropic.Anthropic()
+    # Org-level API keys (not scoped to a workspace) must name the workspace on every request.
+    workspace_id = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
+    client = anthropic.Anthropic(
+        default_headers={"anthropic-workspace-id": workspace_id} if workspace_id else None,
+    )
 
     stats = {"posted": 0, "already": 0, "closed": 0, "missing": 0, "failed": 0}
     report = []

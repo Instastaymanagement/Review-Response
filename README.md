@@ -23,6 +23,7 @@ Add these repository secrets (**Settings → Secrets and variables → Actions**
 | `HOSPITABLE_API_TOKEN` | Hospitable personal access token. It needs **write** access so it can post review replies. |
 | `MONDAY_API_TOKEN` | monday.com personal API token |
 | `ANTHROPIC_API_KEY` | Claude API key from console.anthropic.com |
+| `ANTHROPIC_WORKSPACE_ID` | Only needed if the API key isn't scoped to a workspace. Copy the workspace ID from Console → Settings → Workspaces. |
 
 ## Running
 

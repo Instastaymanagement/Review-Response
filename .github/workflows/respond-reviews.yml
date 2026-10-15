@@ -33,6 +33,7 @@ jobs:
           HOSPITABLE_API_TOKEN: ${{ secrets.HOSPITABLE_API_TOKEN }}
           MONDAY_API_TOKEN: ${{ secrets.MONDAY_API_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
           # Scheduled runs post for real; manual runs default to a dry run.
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
           MAX_AGE_DAYS: "30"
