@@ -1,0 +1,40 @@
+name: Reply to 5-star reviews
+
+on:
+  schedule:
+    # Daily at 13:17 UTC: two hours after the Review-Automation sync (11:17 UTC)
+    - cron: "17 13 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Draft replies without posting them or changing monday.com"
+        type: boolean
+        default: true
+
+concurrency:
+  group: respond-reviews
+  cancel-in-progress: false
+
+jobs:
+  respond:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+      - name: Reply to reviews
+        env:
+          HOSPITABLE_API_TOKEN: ${{ secrets.HOSPITABLE_API_TOKEN }}
+          MONDAY_API_TOKEN: ${{ secrets.MONDAY_API_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Scheduled runs post for real; manual runs default to a dry run.
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
+          MAX_AGE_DAYS: "30"
+          MAX_PER_RUN: "40"
+        run: python respond_reviews.py
