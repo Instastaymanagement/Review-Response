@@ -62,6 +62,8 @@ Write the reply so that it:
 Do not:
 - Use emojis, hashtags, exclamation marks in every sentence, or quotation marks around the reply.
 - Mention discounts, refunds, promotions, or any promise about the property.
+- Name the property, its street address, unit, or any nickname for it. Say "the place", "the apartment", "the house" or "our home" instead. Naming the city is fine.
+- Invent details. Only refer to things the guest wrote; don't add facts or opinions about the property, the area, or the host that aren't in the review.
 - Mention or hint at private feedback, problems, ratings, or star counts.
 - Sign off with a name or add a greeting line like "Dear".
 
@@ -245,13 +247,13 @@ def style_examples(reviews, limit=4):
 
 # ------------------------------------------------------------------------- Claude
 
-def build_prompt(review, property_name, examples):
+def build_prompt(review, city, examples):
     guest = review.get("guest") or {}
     first_name = (guest.get("first_name") or "").strip() or "there"
     public_text = ((review.get("public") or {}).get("review") or "").strip()
     parts = [
         f"Guest first name: {first_name}",
-        f"Property: {property_name}",
+        f"City of the stay: {city or 'unknown'}",
         f"Platform: {review.get('platform') or 'airbnb'}",
         "",
         "<public_review>",
@@ -272,7 +274,7 @@ def clean_reply(text):
     return text
 
 
-def draft_reply(client, review, property_name, examples):
+def draft_reply(client, review, city, examples):
     response = client.beta.messages.create(
         model=MODEL,
         max_tokens=4000,
@@ -280,7 +282,7 @@ def draft_reply(client, review, property_name, examples):
         betas=["server-side-fallback-2026-07-01"],
         fallbacks="default",
         system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": build_prompt(review, property_name, examples)}],
+        messages=[{"role": "user", "content": build_prompt(review, city, examples)}],
     )
     if response.stop_reason == "refusal":
         return None
@@ -350,7 +352,8 @@ def main():
             report.append(f"REPLY WINDOW CLOSED: {label}")
             continue
 
-        reply = draft_reply(client, review, entry["property"].get("name") or c["property"], examples)
+        city = (entry["property"].get("address") or {}).get("city") or ""
+        reply = draft_reply(client, review, city, examples)
         if not reply:
             stats["failed"] += 1
             report.append(f"NO DRAFT (model declined): {label}")

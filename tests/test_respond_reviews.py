@@ -44,12 +44,13 @@ class PromptTests(unittest.TestCase):
     }
 
     def test_private_feedback_never_sent_to_model(self):
-        prompt = r.build_prompt(self.review, "22 Euston", ["Thanks, Bob!"])
+        prompt = r.build_prompt(self.review, "Brookline", ["Thanks, Bob!"])
         self.assertNotIn("SECRET", prompt)
         self.assertNotIn("Reynolds", prompt)
         self.assertIn("Sue", prompt)
         self.assertIn("Spotless and close to Fenway.", prompt)
         self.assertIn("<example>Thanks, Bob!</example>", prompt)
+        self.assertIn("City of the stay: Brookline", prompt)
 
     def test_rating_only_review(self):
         review = {**self.review, "public": {"rating": 5, "review": ""}}
