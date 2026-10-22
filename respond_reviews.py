@@ -39,8 +39,8 @@ MODEL = "claude-opus-5-5"
 
 # All Reviews Log boards, one per workspace
 REVIEW_BOARDS = {
-    18435520124: "USA Automated (Trial)",
-    18435476757: "Canada Automated(Trial)",
+    18435520124: "Instastay Automated · USA",
+    18435476757: "Instastay Automated · Canada",
 }
 
 RESPONSE_LIMIT = 1000  # Hospitable / Airbnb maximum

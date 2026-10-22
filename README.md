@@ -2,7 +2,7 @@
 
 Every day at **13:17 UTC** (two hours after the [Review-Automation](https://github.com/Instastaymanagement/Review-Automation) sync), this workflow replies publicly to recent 5-star guest reviews.
 
-1. **Find:** reads the *All Reviews Log* boards in **USA Automated (Trial)** and **Canada Automated(Trial)** on monday.com. It picks items where:
+1. **Find:** reads the *All Reviews Log* boards in the **USA** and **Canada** folders of **Instastay Automated** on monday.com. It picks items where:
    - *Overall Rating* is 5,
    - *Host Responded* is unchecked,
    - *Review Date* is within the last 30 days.
